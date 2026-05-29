@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lakeside Window Washing — Operations</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f0ede8;
+    --surface: #faf9f7;
+    --surface2: #f0ede8;
+    --border: #e2ddd7;
+    --border2: #ccc7bf;
+    --text: #1a1714;
+    --text2: #6b6560;
+    --text3: #9e9993;
+    --accent: #2b5ea7;
+    --accent-light: #e8eef8;
+    --accent-text: #1a3d6b;
+    --success: #1a6b3c;
+    --success-bg: #e8f5ee;
+    --danger: #8b1a1a;
+    --danger-bg: #f5e8e8;
+    --warning: #7a5c00;
+    --warning-bg: #fdf3d8;
+    --nav-w: 220px;
+    --header-h: 56px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+  }
+
+  /* LOGIN */
+  #login-screen {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000;
+  }
+  .login-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    width: 340px;
+    text-align: center;
+  }
+  .login-logo {
+    width: 48px; height: 48px;
+    background: var(--accent);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1.25rem;
+    font-size: 24px; color: white;
+  }
+  .login-card h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+  .login-card p { font-size: 13px; color: var(--text2); margin-bottom: 1.5rem; }
+  .login-card input {
+    width: 100%; padding: 10px 14px;
+    border: 1px solid var(--border2);
+    border-radius: 8px; font-size: 15px;
+    font-family: 'DM Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    margin-bottom: 12px;
+    letter-spacing: 0.1em;
+    text-align: center;
+  }
+  .login-card input:focus { outline: none; border-color: var(--accent); }
+  .login-error { font-size: 13px; color: var(--danger); margin-bottom: 10px; display: none; }
+
+  /* LAYOUT */
+  #app { display: none; min-height: 100vh; }
+
+  header {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: var(--header-h);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center;
+    padding: 0 1.25rem 0 calc(var(--nav-w) + 1.25rem);
+    z-index: 100;
+  }
+  .header-title { font-size: 14px; font-weight: 500; color: var(--text2); }
+  .header-title span { color: var(--text); font-weight: 600; }
+
+  nav {
+    position: fixed; top: 0; left: 0; bottom: 0;
+    width: var(--nav-w);
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding-top: var(--header-h);
+    z-index: 99;
+    overflow-y: auto;
+  }
+  .nav-logo {
+    padding: 1rem 1.25rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0.5rem;
+  }
+  .nav-logo-mark {
+    width: 32px; height: 32px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 16px;
+    margin-bottom: 6px;
+  }
+  .nav-logo h2 { font-size: 13px; font-weight: 600; line-height: 1.2; }
+  .nav-logo p { font-size: 11px; color: var(--text3); }
+
+  .nav-section { padding: 0.5rem 0.75rem; }
+  .nav-section-label {
+    font-size: 10px; font-weight: 600;
+    color: var(--text3);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 0.5rem 0.5rem 0.25rem;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    font-size: 13px; font-weight: 400;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.12s;
+    margin-bottom: 2px;
+  }
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active { background: var(--accent-light); color: var(--accent-text); font-weight: 500; }
+  .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; opacity: 0.7; }
+  .nav-item.active svg { opacity: 1; }
+
+  main {
+    margin-left: var(--nav-w);
+    padding-top: var(--header-h);
+    min-height: 100vh;
+  }
+  .form-panel { display: none; padding: 2rem; max-width: 680px; }
+  .form-panel.active { display: block; }
+
+  .panel-title {
+    font-size: 22px; font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .panel-desc { font-size: 14px; color: var(--text2); margin-bottom: 2rem; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .section-label {
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--text3);
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-grid.cols-1 { grid-template-columns: 1fr; }
+  .span-2 { grid-column: 1 / -1; }
+
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 12px; font-weight: 500; color: var(--text2); }
+  .field input, .field select, .field textarea {
+    padding: 9px 12px;
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    transition: border-color 0.12s;
+    width: 100%;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none; border-color: var(--accent);
+  }
+  .field input[readonly] { background: var(--surface2); color: var(--text2); }
+  .field textarea { resize: vertical; min-height: 80px; }
+
+  .toggle-row { display: flex; gap: 6px; }
+  .toggle-btn {
+    flex: 1; padding: 8px;
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text2);
+    font-size: 13px; font-weight: 500;
+    cursor: pointer;
+    transition: all 0.12s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .toggle-btn:hover { border-color: var(--accent); color: var(--accent-text); }
+  .toggle-btn.on { background: var(--accent-light); color: var(--accent-text); border-color: var(--accent); }
+
+  .status-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .status-opt {
+    padding: 10px 12px;
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.12s;
+    font-size: 13px; font-weight: 500;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .status-opt:hover { border-color: var(--accent); background: var(--accent-light); }
+  .status-opt.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent-text); }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+
+  .btn-row { display: flex; gap: 8px; margin-top: 1.25rem; }
+  .btn-primary {
+    flex: 1; padding: 11px 20px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: opacity 0.12s;
+  }
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn-secondary {
+    padding: 11px 16px;
+    background: transparent;
+    color: var(--text2);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .btn-secondary:hover { background: var(--surface2); color: var(--text); }
+
+  .status-msg {
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 13px; font-weight: 500;
+    margin-top: 1rem;
+    display: none;
+  }
+  .status-msg.success { background: var(--success-bg); color: var(--success); }
+  .status-msg.error { background: var(--danger-bg); color: var(--danger); }
+  .status-msg.warning { background: var(--warning-bg); color: var(--warning); }
+
+  .summary-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-top: 1rem;
+    display: none;
+  }
+  .summary-row {
+    display: flex; justify-content: space-between;
+    font-size: 13px; padding: 4px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .summary-row:last-child { border-bottom: none; }
+  .summary-row span:first-child { color: var(--text2); }
+  .summary-row.total { font-weight: 600; padding-top: 8px; margin-top: 4px; }
+
+  .conditional { display: none; }
+  .conditional.show { display: contents; }
+
+  .cleaner-manage-tabs { display: flex; gap: 6px; margin-bottom: 1.25rem; }
+  .manage-tab {
+    padding: 7px 16px;
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    font-size: 13px; font-weight: 500;
+    cursor: pointer;
+    background: var(--bg);
+    color: var(--text2);
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.12s;
+  }
+  .manage-tab.active { background: var(--accent-light); color: var(--accent-text); border-color: var(--accent); }
+
+  .hint { font-size: 12px; color: var(--text3); margin-top: 4px; }
+
+  @media (max-width: 640px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .span-2 { grid-column: 1; }
+    nav { width: 100%; height: auto; position: relative; }
+    main { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">🪟</div>
+    <h1>Lakeside Window Washing</h1>
+    <p>Operations Dashboard — Staff Access</p>
+    <div class="login-error" id="login-error">Incorrect password. Try again.</div>
+    <input type="password" id="pw-input" placeholder="Enter password" onkeydown="if(event.key==='Enter')login()">
+    <button class="btn-primary" onclick="login()" style="width:100%;">Sign in</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header>
+    <div class="header-title">Lakeside Window Washing &mdash; <span id="current-panel-title">Dashboard</span></div>
+  </header>
+
+  <nav>
+    <div class="nav-logo">
+      <div class="nav-logo-mark">🪟</div>
+      <h2>Lakeside</h2>
+      <p>Operations</p>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-label">Jobs</div>
+      <div class="nav-item active" onclick="showPanel('new-job', this, 'New Job Entry')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        New Job Entry
+      </div>
+      <div class="nav-item" onclick="showPanel('assign-cleaner', this, 'Assign Cleaner')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Assign Cleaner
+      </div>
+      <div class="nav-item" onclick="showPanel('job-status', this, 'Change Job Status')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Change Job Status
+      </div>
+      <div class="nav-item" onclick="showPanel('log-payment', this, 'Log Payment')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Log Payment
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-label">Leads</div>
+      <div class="nav-item" onclick="showPanel('enter-lead', this, 'Enter Lead')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Enter Lead
+      </div>
+      <div class="nav-item" onclick="showPanel('convert-lead', this, 'Convert Lead to Job')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+        Convert Lead to Job
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-label">Finance</div>
+      <div class="nav-item" onclick="showPanel('add-expense', this, 'Add Expense')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Add Expense
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-label">Team</div>
+      <div class="nav-item" onclick="showPanel('manage-cleaners', this, 'Manage Contractors')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="23" y1="11" x2="17" y2="11"/><line x1="20" y1="8" x2="20" y2="14"/></svg>
+        Manage Contractors
+      </div>
+    </div>
+  </nav>
+
+  <main>
+
+    <!-- FORM 1: NEW JOB -->
+    <div class="form-panel active" id="panel-new-job">
+      <div class="panel-title">New Job Entry</div>
+      <div class="panel-desc">Book a new job — updates Google Sheets and creates a Calendar event.</div>
+
+      <div class="card">
+        <div class="section-label">Client Information</div>
+        <div class="form-grid">
+          <div class="field"><label>First name *</label><input type="text" id="nj-first" placeholder="Jane"></div>
+          <div class="field"><label>Last name *</label><input type="text" id="nj-last" placeholder="Smith"></div>
+          <div class="field span-2"><label>Street address *</label><input type="text" id="nj-address" placeholder="123 Elm St"></div>
+          <div class="field"><label>City *</label><input type="text" id="nj-city" placeholder="Farmington"></div>
+          <div class="field"><label>Phone *</label><input type="tel" id="nj-phone" placeholder="651-555-1234"></div>
+          <div class="field span-2"><label>Email</label><input type="email" id="nj-email" placeholder="jane@email.com"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Job Details</div>
+        <div class="form-grid">
+          <div class="field"><label>Job date *</label><input type="date" id="nj-date"></div>
+          <div class="field"><label>Job time *</label><input type="time" id="nj-time"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Services</div>
+        <div class="form-grid">
+          <div class="field">
+            <label>Interior</label>
+            <div class="toggle-row">
+              <button class="toggle-btn" onclick="svc(this,'nj-interior','Y')">Yes</button>
+              <button class="toggle-btn on" onclick="svc(this,'nj-interior','N')">No</button>
+            </div>
+            <input type="hidden" id="nj-interior" value="N">
+          </div>
+          <div class="field">
+            <label>Exterior</label>
+            <div class="toggle-row">
+              <button class="toggle-btn" onclick="svc(this,'nj-exterior','Y')">Yes</button>
+              <button class="toggle-btn on" onclick="svc(this,'nj-exterior','N')">No</button>
+            </div>
+            <input type="hidden" id="nj-exterior" value="N">
+          </div>
+          <div class="field">
+            <label>Screens</label>
+            <div class="toggle-row">
+              <button class="toggle-btn" onclick="svc(this,'nj-screens','Y')">Yes</button>
+              <button class="toggle-btn on" onclick="svc(this,'nj-screens','N')">No</button>
+            </div>
+            <input type="hidden" id="nj-screens" value="N">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Pricing</div>
+        <div class="form-grid">
+          <div class="field"><label>Window quote ($)</label><input type="number" id="nj-wquote" placeholder="0" min="0" oninput="calcTotal('nj-wquote','nj-squote','nj-total')"></div>
+          <div class="field"><label>Screen quote ($)</label><input type="number" id="nj-squote" placeholder="0" min="0" oninput="calcTotal('nj-wquote','nj-squote','nj-total')"></div>
+          <div class="field span-2"><label>Total quote ($)</label><input type="number" id="nj-total" readonly></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Notes</div>
+        <div class="field"><textarea id="nj-notes" placeholder="Gate code, parking info, special instructions..."></textarea></div>
+      </div>
+
+      <div class="summary-box" id="nj-summary"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="resetForm('nj')">Reset</button>
+        <button class="btn-primary" id="nj-btn" onclick="submitNewJob()">Book Job</button>
+      </div>
+      <div class="status-msg" id="nj-status"></div>
+    </div>
+
+    <!-- FORM 2: ASSIGN CLEANER -->
+    <div class="form-panel" id="panel-assign-cleaner">
+      <div class="panel-title">Assign Cleaner</div>
+      <div class="panel-desc">Assign a contractor to a job — updates the Jobs sheet and Calendar event.</div>
+      <div class="card">
+        <div class="section-label">Job</div>
+        <div class="form-grid">
+          <div class="field span-2"><label>Job ID *</label><input type="text" id="ac-jobid" placeholder="e.g. 12"></div>
+          <div class="field span-2">
+            <label>Assign contractor *</label>
+            <select id="ac-cleaner"><option value="">Loading contractors...</option></select>
+          </div>
+          <div class="field span-2"><label>Notes to contractor</label><textarea id="ac-notes" placeholder="Anything specific they should know..."></textarea></div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="document.getElementById('ac-jobid').value='';document.getElementById('ac-notes').value=''">Reset</button>
+        <button class="btn-primary" id="ac-btn" onclick="submitAssignCleaner()">Assign Contractor</button>
+      </div>
+      <div class="status-msg" id="ac-status"></div>
+    </div>
+
+    <!-- FORM 3: JOB STATUS -->
+    <div class="form-panel" id="panel-job-status">
+      <div class="panel-title">Change Job Status</div>
+      <div class="panel-desc">Update the status of an existing job.</div>
+      <div class="card">
+        <div class="section-label">Job</div>
+        <div class="field"><label>Job ID *</label><input type="text" id="js-jobid" placeholder="e.g. 12"></div>
+      </div>
+      <div class="card">
+        <div class="section-label">New Status</div>
+        <div class="status-options">
+          <div class="status-opt" onclick="selectStatus(this,'Complete')" data-status="Complete">
+            <div class="status-dot" style="background:#1a6b3c"></div> Complete
+          </div>
+          <div class="status-opt" onclick="selectStatus(this,'Cancel')" data-status="Cancel">
+            <div class="status-dot" style="background:#8b1a1a"></div> Cancel
+          </div>
+          <div class="status-opt" onclick="selectStatus(this,'Reschedule')" data-status="Reschedule">
+            <div class="status-dot" style="background:#7a5c00"></div> Reschedule
+          </div>
+          <div class="status-opt" onclick="selectStatus(this,'No Show')" data-status="No Show">
+            <div class="status-dot" style="background:#5c3d7a"></div> No Show
+          </div>
+        </div>
+        <input type="hidden" id="js-status" value="">
+      </div>
+      <div class="card conditional" id="js-reschedule-fields">
+        <div class="section-label">New Date & Time</div>
+        <div class="form-grid">
+          <div class="field"><label>New date *</label><input type="date" id="js-newdate"></div>
+          <div class="field"><label>New time *</label><input type="time" id="js-newtime"></div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="resetStatusForm()">Reset</button>
+        <button class="btn-primary" id="js-btn" onclick="submitJobStatus()">Update Status</button>
+      </div>
+      <div class="status-msg" id="js-status-msg"></div>
+    </div>
+
+    <!-- FORM 4: LOG PAYMENT -->
+    <div class="form-panel" id="panel-log-payment">
+      <div class="panel-title">Log Payment Received</div>
+      <div class="panel-desc">Mark a job as paid and update the Profit & Loss sheet.</div>
+      <div class="card">
+        <div class="section-label">Job</div>
+        <div class="form-grid">
+          <div class="field span-2"><label>Job ID *</label><input type="text" id="lp-jobid" placeholder="e.g. 12"></div>
+          <div class="field span-2">
+            <label>Payment type *</label>
+            <select id="lp-paytype">
+              <option value="">Select payment type</option>
+              <option>Cash</option>
+              <option>Card</option>
+              <option>Venmo</option>
+              <option>Zelle</option>
+              <option>Check</option>
+            </select>
+          </div>
+          <div class="field"><label>Amount received ($) *</label><input type="number" id="lp-amount" placeholder="0" min="0"></div>
+          <div class="field"><label>Date received</label><input type="date" id="lp-date"></div>
+          <div class="field span-2"><label>Notes</label><textarea id="lp-notes" placeholder="Any payment notes..."></textarea></div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="resetForm('lp')">Reset</button>
+        <button class="btn-primary" id="lp-btn" onclick="submitPayment()">Log Payment</button>
+      </div>
+      <div class="status-msg" id="lp-status"></div>
+    </div>
+
+    <!-- FORM 5: ENTER LEAD -->
+    <div class="form-panel" id="panel-enter-lead">
+      <div class="panel-title">Enter Lead</div>
+      <div class="panel-desc">Add a new prospect to the Leads sheet.</div>
+      <div class="card">
+        <div class="section-label">Contact Information</div>
+        <div class="form-grid">
+          <div class="field"><label>First name *</label><input type="text" id="el-first" placeholder="Jane"></div>
+          <div class="field"><label>Last name *</label><input type="text" id="el-last" placeholder="Smith"></div>
+          <div class="field span-2"><label>Address</label><input type="text" id="el-address" placeholder="123 Elm St"></div>
+          <div class="field"><label>City</label><input type="text" id="el-city" placeholder="Farmington"></div>
+          <div class="field"><label>Phone *</label><input type="tel" id="el-phone" placeholder="651-555-1234"></div>
+          <div class="field span-2"><label>Email</label><input type="email" id="el-email" placeholder="jane@email.com"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-label">Services Interested In</div>
+        <div class="form-grid">
+          <div class="field">
+            <label>Interior</label>
+            <div class="toggle-row">
+              <button class="toggle-btn" onclick="svc(this,'el-interior','Y')">Yes</button>
+              <button class="toggle-btn on" onclick="svc(this,'el-interior','N')">No</button>
+            </div>
+            <input type="hidden" id="el-interior" value="N">
+          </div>
+          <div class="field">
+            <label>Exterior</label>
+            <div class="toggle-row">
+              <button class="toggle-btn" onclick="svc(this,'el-exterior','Y')">Yes</button>
+              <button class="toggle-btn on" onclick="svc(this,'el-exterior','N')">No</button>
+            </div>
+            <input type="hidden" id="el-exterior" value="N">
+          </div>
+          <div class="field">
+            <label>Screens</label>
+            <div class="toggle-row">
+              <button class="toggle-btn" onclick="svc(this,'el-screens','Y')">Yes</button>
+              <button class="toggle-btn on" onclick="svc(this,'el-screens','N')">No</button>
+            </div>
+            <input type="hidden" id="el-screens" value="N">
+          </div>
+          <div class="field span-2"><label>Estimated quote ($)</label><input type="number" id="el-quote" placeholder="0" min="0"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-label">Notes</div>
+        <div class="field"><textarea id="el-notes" placeholder="How they heard about us, timeline, any other notes..."></textarea></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="resetForm('el')">Reset</button>
+        <button class="btn-primary" id="el-btn" onclick="submitLead()">Add Lead</button>
+      </div>
+      <div class="status-msg" id="el-status"></div>
+    </div>
+
+    <!-- FORM 6: CONVERT LEAD -->
+    <div class="form-panel" id="panel-convert-lead">
+      <div class="panel-title">Convert Lead to Job</div>
+      <div class="panel-desc">Look up a lead and convert them to a booked job.</div>
+      <div class="card">
+        <div class="section-label">Find Lead</div>
+        <div class="form-grid">
+          <div class="field"><label>Last name *</label><input type="text" id="cl-last" placeholder="Smith"></div>
+          <div class="field"><label>Phone</label><input type="tel" id="cl-phone" placeholder="651-555-1234"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-label">Job Details</div>
+        <div class="form-grid">
+          <div class="field"><label>First name *</label><input type="text" id="cl-first" placeholder="Jane"></div>
+          <div class="field"><label>Last name *</label><input type="text" id="cl-clast" placeholder="Smith"></div>
+          <div class="field span-2"><label>Address *</label><input type="text" id="cl-address" placeholder="123 Elm St"></div>
+          <div class="field"><label>City *</label><input type="text" id="cl-city" placeholder="Farmington"></div>
+          <div class="field"><label>Email</label><input type="email" id="cl-email" placeholder="jane@email.com"></div>
+          <div class="field"><label>Job date *</label><input type="date" id="cl-date"></div>
+          <div class="field"><label>Job time *</label><input type="time" id="cl-time"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-label">Services & Pricing</div>
+        <div class="form-grid">
+          <div class="field">
+            <label>Interior</label>
+            <div class="toggle-row">
+              <button class="toggle-btn" onclick="svc(this,'cl-interior','Y')">Yes</button>
+              <button class="toggle-btn on" onclick="svc(this,'cl-interior','N')">No</button>
+            </div>
+            <input type="hidden" id="cl-interior" value="N">
+          </div>
+          <div class="field">
+            <label>Exterior</label>
+            <div class="toggle-row">
+              <button class="toggle-btn" onclick="svc(this,'cl-exterior','Y')">Yes</button>
+              <button class="toggle-btn on" onclick="svc(this,'cl-exterior','N')">No</button>
+            </div>
+            <input type="hidden" id="cl-exterior" value="N">
+          </div>
+          <div class="field">
+            <label>Screens</label>
+            <div class="toggle-row">
+              <button class="toggle-btn" onclick="svc(this,'cl-screens','Y')">Yes</button>
+              <button class="toggle-btn on" onclick="svc(this,'cl-screens','N')">No</button>
+            </div>
+            <input type="hidden" id="cl-screens" value="N">
+          </div>
+          <div class="field"><label>Window quote ($) *</label><input type="number" id="cl-wquote" placeholder="0" min="0" oninput="calcTotal('cl-wquote','cl-squote','cl-total')"></div>
+          <div class="field"><label>Screen quote ($)</label><input type="number" id="cl-squote" placeholder="0" min="0" oninput="calcTotal('cl-wquote','cl-squote','cl-total')"></div>
+          <div class="field span-2"><label>Total ($)</label><input type="number" id="cl-total" readonly></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-label">Notes</div>
+        <div class="field"><textarea id="cl-notes" placeholder="Any notes..."></textarea></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="resetForm('cl')">Reset</button>
+        <button class="btn-primary" id="cl-btn" onclick="submitConvertLead()">Convert to Job</button>
+      </div>
+      <div class="status-msg" id="cl-status"></div>
+    </div>
+
+    <!-- FORM 7: ADD EXPENSE -->
+    <div class="form-panel" id="panel-add-expense">
+      <div class="panel-title">Add Expense</div>
+      <div class="panel-desc">Log a business expense to the Profit & Loss sheet.</div>
+      <div class="card">
+        <div class="section-label">Expense Details</div>
+        <div class="form-grid">
+          <div class="field"><label>Date *</label><input type="date" id="ae-date"></div>
+          <div class="field">
+            <label>Category *</label>
+            <select id="ae-category">
+              <option value="">Select category</option>
+              <option>Supplies</option>
+              <option>Software</option>
+              <option>Equipment</option>
+              <option>Vehicle</option>
+              <option>Marketing</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field span-2"><label>Description *</label><input type="text" id="ae-desc" placeholder="e.g. Squeegees and cleaning solution"></div>
+          <div class="field"><label>Amount ($) *</label><input type="number" id="ae-amount" placeholder="0" min="0"></div>
+          <div class="field">
+            <label>Payment type *</label>
+            <select id="ae-paytype">
+              <option value="">Select type</option>
+              <option>Cash</option>
+              <option>Card</option>
+              <option>Venmo</option>
+              <option>Zelle</option>
+              <option>Check</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="resetForm('ae')">Reset</button>
+        <button class="btn-primary" id="ae-btn" onclick="submitExpense()">Log Expense</button>
+      </div>
+      <div class="status-msg" id="ae-status"></div>
+    </div>
+
+    <!-- FORM 8: MANAGE CLEANERS -->
+    <div class="form-panel" id="panel-manage-cleaners">
+      <div class="panel-title">Manage Contractors</div>
+      <div class="panel-desc">Add a new contractor or update an existing one.</div>
+
+      <div class="cleaner-manage-tabs">
+        <button class="manage-tab active" onclick="cleanerTab(this,'mc-add')">Add Contractor</button>
+        <button class="manage-tab" onclick="cleanerTab(this,'mc-edit')">Edit Contractor</button>
+      </div>
+
+      <div id="mc-add">
+        <div class="card">
+          <div class="section-label">New Contractor</div>
+          <div class="form-grid">
+            <div class="field"><label>First name *</label><input type="text" id="mc-first" placeholder="Alex"></div>
+            <div class="field"><label>Last name *</label><input type="text" id="mc-last" placeholder="Johnson"></div>
+            <div class="field span-2"><label>Phone *</label><input type="tel" id="mc-phone" placeholder="651-555-0000"></div>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-secondary" onclick="resetForm('mc')">Reset</button>
+          <button class="btn-primary" id="mc-btn" onclick="submitAddCleaner()">Add Contractor</button>
+        </div>
+        <div class="status-msg" id="mc-status"></div>
+      </div>
+
+      <div id="mc-edit" style="display:none;">
+        <div class="card">
+          <div class="section-label">Select Contractor</div>
+          <div class="field"><select id="mc-edit-select" onchange="populateEdit()"><option value="">Select contractor</option></select></div>
+        </div>
+        <div class="card">
+          <div class="section-label">Update Details</div>
+          <div class="form-grid">
+            <div class="field"><label>First name</label><input type="text" id="mc-edit-first" placeholder="Alex"></div>
+            <div class="field"><label>Last name</label><input type="text" id="mc-edit-last" placeholder="Johnson"></div>
+            <div class="field"><label>Phone</label><input type="tel" id="mc-edit-phone" placeholder="651-555-0000"></div>
+            <div class="field">
+              <label>Status</label>
+              <select id="mc-edit-active">
+                <option value="Y">Active</option>
+                <option value="N">Inactive</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-primary" id="mc-edit-btn" onclick="submitEditCleaner()">Save Changes</button>
+        </div>
+        <div class="status-msg" id="mc-edit-status"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const SPREADSHEET_ID = '1W0X2bcmUj9Vjm47r2jQq7Z4Oh3N8VVOkX3bj-7NHMdU';
+const PASSWORD = 'LakesideWW';
+
+const WEBHOOKS = {
+  newJob:       'https://hook.us2.make.com/vr1s8h44ktoaujpeec12y60xkre1dawt',
+  assignCleaner:'WEBHOOK_ASSIGN_CLEANER',
+  jobStatus:    'WEBHOOK_JOB_STATUS',
+  logPayment:   'WEBHOOK_LOG_PAYMENT',
+  enterLead:    'WEBHOOK_ENTER_LEAD',
+  convertLead:  'WEBHOOK_CONVERT_LEAD',
+  addExpense:   'WEBHOOK_ADD_EXPENSE',
+  addCleaner:   'WEBHOOK_ADD_CLEANER',
+  editCleaner:  'WEBHOOK_EDIT_CLEANER'
+};
+
+let cleanersData = [];
+
+function login() {
+  const val = document.getElementById('pw-input').value;
+  if (val === PASSWORD) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    loadCleaners();
+    setTodayDates();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+    document.getElementById('pw-input').value = '';
+  }
+}
+
+function setTodayDates() {
+  const today = new Date().toISOString().split('T')[0];
+  ['lp-date','ae-date'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = today;
+  });
+}
+
+function showPanel(id, el, title) {
+  document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  el.classList.add('active');
+  document.getElementById('current-panel-title').textContent = title;
+}
+
+function svc(btn, hiddenId, val) {
+  const group = btn.parentElement;
+  group.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById(hiddenId).value = val;
+}
+
+function calcTotal(wId, sId, tId) {
+  const w = parseFloat(document.getElementById(wId).value) || 0;
+  const s = parseFloat(document.getElementById(sId).value) || 0;
+  document.getElementById(tId).value = (w + s).toFixed(2);
+}
+
+function showStatus(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = 'status-msg ' + type;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 6000);
+}
+
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  btn.disabled = loading;
+  btn.textContent = loading ? 'Submitting...' : btn.getAttribute('data-label') || btn.textContent;
+}
+
+async function post(webhook, payload, btnId, statusId, successMsg) {
+  const btn = document.getElementById(btnId);
+  const origText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+  try {
+    const res = await fetch(webhook, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) {
+      showStatus(statusId, successMsg, 'success');
+    } else {
+      throw new Error('Server error');
+    }
+  } catch(e) {
+    showStatus(statusId, 'Submission failed. Check your connection and try again.', 'error');
+  }
+  btn.disabled = false;
+  btn.textContent = origText;
+}
+
+async function loadCleaners() {
+  try {
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/Contractors!A2:D100?key=YOUR_API_KEY`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.values) {
+      cleanersData = data.values.filter(r => r[3] === 'Y' || r[3] === 'y');
+      populateCleanerDropdowns();
+    }
+  } catch(e) {
+    cleanersData = [];
+    document.getElementById('ac-cleaner').innerHTML = '<option value="">Enter contractor name manually</option>';
+  }
+}
+
+function populateCleanerDropdowns() {
+  const opts = cleanersData.map(r => `<option value="${r[0]} ${r[1]}">${r[0]} ${r[1]} — ${r[2]||''}</option>`).join('');
+  document.getElementById('ac-cleaner').innerHTML = '<option value="">Select contractor</option>' + opts;
+  const editSel = document.getElementById('mc-edit-select');
+  const allOpts = cleanersData.map(r => `<option value="${r[0]} ${r[1]}">${r[0]} ${r[1]}</option>`).join('');
+  editSel.innerHTML = '<option value="">Select contractor</option>' + allOpts;
+}
+
+function populateEdit() {
+  const val = document.getElementById('mc-edit-select').value;
+  const cleaner = cleanersData.find(r => `${r[0]} ${r[1]}` === val);
+  if (cleaner) {
+    document.getElementById('mc-edit-first').value = cleaner[0] || '';
+    document.getElementById('mc-edit-last').value = cleaner[1] || '';
+    document.getElementById('mc-edit-phone').value = cleaner[2] || '';
+    document.getElementById('mc-edit-active').value = cleaner[3] || 'Y';
+  }
+}
+
+function cleanerTab(btn, showId) {
+  document.querySelectorAll('.manage-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('mc-add').style.display = showId === 'mc-add' ? 'block' : 'none';
+  document.getElementById('mc-edit').style.display = showId === 'mc-edit' ? 'block' : 'none';
+}
+
+function selectStatus(el, status) {
+  document.querySelectorAll('.status-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('js-status').value = status;
+  const reschedFields = document.getElementById('js-reschedule-fields');
+  reschedFields.classList.toggle('show', status === 'Reschedule');
+}
+
+function resetStatusForm() {
+  document.getElementById('js-jobid').value = '';
+  document.getElementById('js-status').value = '';
+  document.querySelectorAll('.status-opt').forEach(o => o.classList.remove('selected'));
+  document.getElementById('js-reschedule-fields').classList.remove('show');
+  document.getElementById('js-newdate').value = '';
+  document.getElementById('js-newtime').value = '';
+}
+
+function resetForm(prefix) {
+  document.querySelectorAll(`[id^="${prefix}-"]`).forEach(el => {
+    if (el.tagName === 'INPUT' && el.type !== 'hidden') el.value = '';
+    if (el.tagName === 'SELECT') el.selectedIndex = 0;
+    if (el.tagName === 'TEXTAREA') el.value = '';
+    if (el.type === 'hidden') el.value = 'N';
+  });
+  document.querySelectorAll(`[id^="${prefix}-"] ~ .toggle-row .toggle-btn`).forEach(b => b.classList.remove('on'));
+}
+
+function submitNewJob() {
+  const required = ['nj-first','nj-last','nj-address','nj-city','nj-phone','nj-date','nj-time'];
+  if (required.some(id => !document.getElementById(id).value.trim())) {
+    showStatus('nj-status', 'Please fill in all required fields.', 'error'); return;
+  }
+  const payload = {
+    client_first: document.getElementById('nj-first').value.trim(),
+    client_last: document.getElementById('nj-last').value.trim(),
+    address: document.getElementById('nj-address').value.trim(),
+    city: document.getElementById('nj-city').value.trim(),
+    phone: document.getElementById('nj-phone').value.trim(),
+    email: document.getElementById('nj-email').value.trim(),
+    job_date: document.getElementById('nj-date').value,
+    job_time: document.getElementById('nj-time').value,
+    interior: document.getElementById('nj-interior').value,
+    exterior: document.getElementById('nj-exterior').value,
+    screens: document.getElementById('nj-screens').value,
+    window_quote: document.getElementById('nj-wquote').value || '0',
+    screen_quote: document.getElementById('nj-squote').value || '0',
+    total_quote: document.getElementById('nj-total').value || '0',
+    notes: document.getElementById('nj-notes').value.trim()
+  };
+  post(WEBHOOKS.newJob, payload, 'nj-btn', 'nj-status', '✓ Job booked! Google Sheets and Calendar have been updated.');
+}
+
+function submitAssignCleaner() {
+  if (!document.getElementById('ac-jobid').value || !document.getElementById('ac-cleaner').value) {
+    showStatus('ac-status', 'Please fill in Job ID and select a contractor.', 'error'); return;
+  }
+  const payload = {
+    job_id: document.getElementById('ac-jobid').value.trim(),
+    cleaner: document.getElementById('ac-cleaner').value,
+    notes: document.getElementById('ac-notes').value.trim()
+  };
+  post(WEBHOOKS.assignCleaner, payload, 'ac-btn', 'ac-status', '✓ Contractor assigned! Jobs sheet and Calendar have been updated.');
+}
+
+function submitJobStatus() {
+  if (!document.getElementById('js-jobid').value || !document.getElementById('js-status').value) {
+    showStatus('js-status-msg', 'Please enter a Job ID and select a status.', 'error'); return;
+  }
+  const status = document.getElementById('js-status').value;
+  if (status === 'Reschedule' && (!document.getElementById('js-newdate').value || !document.getElementById('js-newtime').value)) {
+    showStatus('js-status-msg', 'Please enter a new date and time for the reschedule.', 'error'); return;
+  }
+  const payload = {
+    job_id: document.getElementById('js-jobid').value.trim(),
+    status: status,
+    new_date: document.getElementById('js-newdate').value || '',
+    new_time: document.getElementById('js-newtime').value || ''
+  };
+  post(WEBHOOKS.jobStatus, payload, 'js-btn', 'js-status-msg', `✓ Job marked as ${status}. Sheets and Calendar updated.`);
+}
+
+function submitPayment() {
+  const required = ['lp-jobid','lp-paytype','lp-amount'];
+  if (required.some(id => !document.getElementById(id).value)) {
+    showStatus('lp-status', 'Please fill in all required fields.', 'error'); return;
+  }
+  const payload = {
+    job_id: document.getElementById('lp-jobid').value.trim(),
+    payment_type: document.getElementById('lp-paytype').value,
+    amount: document.getElementById('lp-amount').value,
+    date_received: document.getElementById('lp-date').value,
+    notes: document.getElementById('lp-notes').value.trim()
+  };
+  post(WEBHOOKS.logPayment, payload, 'lp-btn', 'lp-status', '✓ Payment logged! P&L sheet updated.');
+}
+
+function submitLead() {
+  const required = ['el-first','el-last','el-phone'];
+  if (required.some(id => !document.getElementById(id).value.trim())) {
+    showStatus('el-status', 'Please fill in all required fields.', 'error'); return;
+  }
+  const payload = {
+    first: document.getElementById('el-first').value.trim(),
+    last: document.getElementById('el-last').value.trim(),
+    address: document.getElementById('el-address').value.trim(),
+    city: document.getElementById('el-city').value.trim(),
+    phone: document.getElementById('el-phone').value.trim(),
+    email: document.getElementById('el-email').value.trim(),
+    interior: document.getElementById('el-interior').value,
+    exterior: document.getElementById('el-exterior').value,
+    screens: document.getElementById('el-screens').value,
+    quoted_amount: document.getElementById('el-quote').value || '0',
+    notes: document.getElementById('el-notes').value.trim(),
+    status: 'Lead',
+    date_added: new Date().toISOString().split('T')[0]
+  };
+  post(WEBHOOKS.enterLead, payload, 'el-btn', 'el-status', '✓ Lead added to the Leads sheet.');
+}
+
+function submitConvertLead() {
+  const required = ['cl-first','cl-clast','cl-address','cl-city','cl-phone','cl-date','cl-time','cl-wquote'];
+  if (required.some(id => !document.getElementById(id).value.trim())) {
+    showStatus('cl-status', 'Please fill in all required fields.', 'error'); return;
+  }
+  const payload = {
+    client_first: document.getElementById('cl-first').value.trim(),
+    client_last: document.getElementById('cl-clast').value.trim(),
+    address: document.getElementById('cl-address').value.trim(),
+    city: document.getElementById('cl-city').value.trim(),
+    phone: document.getElementById('cl-phone').value.trim(),
+    email: document.getElementById('cl-email').value.trim(),
+    job_date: document.getElementById('cl-date').value,
+    job_time: document.getElementById('cl-time').value,
+    interior: document.getElementById('cl-interior').value,
+    exterior: document.getElementById('cl-exterior').value,
+    screens: document.getElementById('cl-screens').value,
+    window_quote: document.getElementById('cl-wquote').value || '0',
+    screen_quote: document.getElementById('cl-squote').value || '0',
+    total_quote: document.getElementById('cl-total').value || '0',
+    notes: document.getElementById('cl-notes').value.trim(),
+    converted_from_lead: true
+  };
+  post(WEBHOOKS.convertLead, payload, 'cl-btn', 'cl-status', '✓ Lead converted! Job booked and Calendar event created.');
+}
+
+function submitExpense() {
+  const required = ['ae-date','ae-category','ae-desc','ae-amount','ae-paytype'];
+  if (required.some(id => !document.getElementById(id).value)) {
+    showStatus('ae-status', 'Please fill in all required fields.', 'error'); return;
+  }
+  const payload = {
+    date: document.getElementById('ae-date').value,
+    category: document.getElementById('ae-category').value,
+    description: document.getElementById('ae-desc').value.trim(),
+    amount: document.getElementById('ae-amount').value,
+    payment_type: document.getElementById('ae-paytype').value
+  };
+  post(WEBHOOKS.addExpense, payload, 'ae-btn', 'ae-status', '✓ Expense logged to P&L sheet.');
+}
+
+function submitAddCleaner() {
+  const required = ['mc-first','mc-last','mc-phone'];
+  if (required.some(id => !document.getElementById(id).value.trim())) {
+    showStatus('mc-status', 'Please fill in all required fields.', 'error'); return;
+  }
+  const payload = {
+    first: document.getElementById('mc-first').value.trim(),
+    last: document.getElementById('mc-last').value.trim(),
+    phone: document.getElementById('mc-phone').value.trim(),
+    active: 'Y'
+  };
+  post(WEBHOOKS.addCleaner, payload, 'mc-btn', 'mc-status', '✓ Contractor added to the Contractors sheet.');
+}
+
+function submitEditCleaner() {
+  const selected = document.getElementById('mc-edit-select').value;
+  if (!selected) { showStatus('mc-edit-status', 'Please select a contractor to edit.', 'error'); return; }
+  const payload = {
+    original_name: selected,
+    first: document.getElementById('mc-edit-first').value.trim(),
+    last: document.getElementById('mc-edit-last').value.trim(),
+    phone: document.getElementById('mc-edit-phone').value.trim(),
+    active: document.getElementById('mc-edit-active').value
+  };
+  post(WEBHOOKS.editCleaner, payload, 'mc-edit-btn', 'mc-edit-status', '✓ Contractor updated.');
+}
+</script>
+</body>
+</html>
