@@ -744,11 +744,22 @@ async function post(payload, btnId, statusId, successMsg) {
 
 async function loadCleaners() {
   try {
-    const res = await fetch(SCRIPT_URL + '?action=get_contractors');
-    const data = await res.json();
-    if (data.success && data.contractors) {
-      cleanersData = data.contractors;
-      populateCleanerDropdowns();
+    const [activeRes, allRes] = await Promise.all([
+      fetch(SCRIPT_URL + '?action=get_contractors'),
+      fetch(SCRIPT_URL + '?action=get_all_contractors')
+    ]);
+    const activeData = await activeRes.json();
+    const allData = await allRes.json();
+
+    if (activeData.success) {
+      cleanersData = activeData.contractors;
+      const opts = cleanersData.map(c => `<option value="${c.name}">${c.name} — ${c.phone}</option>`).join('');
+      document.getElementById('ac-cleaner').innerHTML = '<option value="">Select contractor</option>' + opts;
+    }
+
+    if (allData.success) {
+      const allOpts = allData.contractors.map(c => `<option value="${c.name}">${c.name} — ${c.phone} (${c.active === 'Y' ? 'Active' : 'Inactive'})</option>`).join('');
+      document.getElementById('mc-edit-select').innerHTML = '<option value="">Select contractor</option>' + allOpts;
     }
   } catch(e) {
     document.getElementById('ac-cleaner').innerHTML = '<option value="">Could not load contractors</option>';
