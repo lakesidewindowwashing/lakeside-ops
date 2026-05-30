@@ -285,6 +285,9 @@
       <div class="nav-item" onclick="showPanel('add-expense',this,'Add Expense')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Add Expense
       </div>
+      <div class="nav-item" onclick="showPanel('pay-contractor',this,'Pay Contractor')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Pay Contractor
+      </div>
     </div>
     <div class="nav-section">
       <div class="nav-section-label">Team</div>
@@ -663,7 +666,33 @@
       </div>
     </div>
 
+    <!-- FORM 9: PAY CONTRACTOR -->
+    <div class="form-panel" id="panel-pay-contractor">
+      <div class="panel-title">Pay Contractor</div>
+      <div class="panel-desc">Record a contractor payment — updates Jobs sheet and logs expense to P&L.</div>
+      <div class="card">
+        <div class="section-label">Job</div>
+        <div class="form-grid">
+          <div class="field span-2"><label>Job ID *</label><input type="text" id="pc-jobid" placeholder="e.g. 12"></div>
+          <div class="field span-2">
+            <label>Payment type *</label>
+            <select id="pc-paytype">
+              <option value="">Select payment type</option>
+              <option>Cash</option><option>Card</option>
+              <option>Venmo</option><option>Zelle</option><option>Check</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="resetForm('pc')">Reset</button>
+        <button class="btn-primary" id="pc-btn" onclick="submitPayContractor()">Log Contractor Payment</button>
+      </div>
+      <div class="status-msg" id="pc-status"></div>
+    </div>
+
   </main>
+
 </div>
 
 <script>
@@ -978,6 +1007,18 @@ function submitEditCleaner() {
     phone: document.getElementById('mc-edit-phone').value.trim(),
     active: document.getElementById('mc-edit-active').value
   }, 'mc-edit-btn', 'mc-edit-status', '✓ Contractor updated.');
+}
+
+function submitPayContractor() {
+  const req = ['pc-jobid','pc-paytype'];
+  if (req.some(id => !document.getElementById(id).value)) {
+    showStatus('pc-status','Please fill in all required fields.','error'); return;
+  }
+  post({
+    form_type: 'pay_contractor',
+    job_id: document.getElementById('pc-jobid').value.trim(),
+    payment_type: document.getElementById('pc-paytype').value
+  }, 'pc-btn', 'pc-status', '✓ Contractor payment logged! P&L updated.');
 }
 </script>
 </body>
