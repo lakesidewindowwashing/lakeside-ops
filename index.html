@@ -230,6 +230,38 @@
     font-family: 'DM Sans', sans-serif; transition: all 0.12s;
   }
   .manage-tab.active { background: var(--accent-light); color: var(--accent-text); border-color: var(--accent); }
+
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  color: var(--text);
+  font-size: 20px;
+  margin-right: 12px;
+}
+.nav-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  z-index: 98;
+}
+@media (max-width: 768px) {
+  .hamburger { display: block; }
+  nav {
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+  }
+  nav.open { transform: translateX(0); }
+  nav.open ~ .nav-overlay { display: block; }
+  main { margin-left: 0; }
+  header { padding-left: 1rem; }
+  .form-panel { padding: 1rem; }
+  .form-grid { grid-template-columns: 1fr; }
+  .span-2 { grid-column: 1; }
+}
 </style>
 </head>
 <body>
@@ -247,8 +279,10 @@
 
 <div id="app">
   <header>
+    <button class="hamburger" onclick="toggleNav()" aria-label="Toggle menu">☰</button>
     <div class="header-title">Lakeside Window Washing &mdash; <span id="current-panel-title">Operations</span></div>
   </header>
+  <div class="nav-overlay" id="nav-overlay" onclick="closeNav()"></div>
 
   <nav>
     <div class="nav-logo">
@@ -712,6 +746,16 @@ function login() {
   }
 }
 
+function toggleNav() {
+  document.querySelector('nav').classList.toggle('open');
+  document.getElementById('nav-overlay').classList.toggle('open');
+}
+
+function closeNav() {
+  document.querySelector('nav').classList.remove('open');
+  document.getElementById('nav-overlay').classList.remove('open');
+}
+
 function setTodayDates() {
   const today = new Date().toISOString().split('T')[0];
   ['lp-date','ae-date'].forEach(id => {
@@ -726,6 +770,7 @@ function showPanel(id, el, title) {
   document.getElementById('panel-' + id).classList.add('active');
   el.classList.add('active');
   document.getElementById('current-panel-title').textContent = title;
+  closeNav();
 }
 
 function svc(btn, hiddenId, val) {
