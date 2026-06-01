@@ -344,7 +344,7 @@
           <div class="field"><label>Last name *</label><input type="text" id="nj-last" placeholder="Smith"></div>
           <div class="field span-2"><label>Street address *</label><input type="text" id="nj-address" placeholder="123 Elm St"></div>
           <div class="field"><label>City *</label><input type="text" id="nj-city" placeholder="Farmington"></div>
-          <div class="field"><label>Phone *</label><input type="tel" id="nj-phone" placeholder="651-555-1234"></div>
+          <div class="field"><label>Phone </label><input type="tel" id="nj-phone" placeholder="651-555-1234"></div>
           <div class="field span-2"><label>Email</label><input type="email" id="nj-email" placeholder="jane@email.com"></div>
         </div>
       </div>
@@ -503,7 +503,7 @@
           <div class="field"><label>Last name *</label><input type="text" id="el-last" placeholder="Smith"></div>
           <div class="field span-2"><label>Address</label><input type="text" id="el-address" placeholder="123 Elm St"></div>
           <div class="field"><label>City</label><input type="text" id="el-city" placeholder="Farmington"></div>
-          <div class="field"><label>Phone *</label><input type="tel" id="el-phone" placeholder="651-555-1234"></div>
+          <div class="field"><label>Phone </label><input type="tel" id="el-phone" placeholder="651-555-1234"></div>
           <div class="field span-2"><label>Email</label><input type="email" id="el-email" placeholder="jane@email.com"></div>
         </div>
       </div>
@@ -556,7 +556,7 @@
         <div class="section-label">Find Lead</div>
         <div class="form-grid">
           <div class="field"><label>Last name *</label><input type="text" id="cl-last" placeholder="Smith"></div>
-          <div class="field"><label>Phone *</label><input type="tel" id="cl-phone" placeholder="651-555-1234"></div>
+          <div class="field"><label>Phone </label><input type="tel" id="cl-phone" placeholder="651-555-1234"></div>
         </div>
       </div>
       <div class="card">
@@ -897,9 +897,12 @@ function resetForm(prefix) {
 }
 
 function submitNewJob() {
-  const req = ['nj-first','nj-last','nj-address','nj-city','nj-phone','nj-date','nj-time'];
+  const req = ['nj-first','nj-last','nj-address','nj-city','nj-date','nj-time'];
   if (req.some(id => !document.getElementById(id).value.trim())) {
     showStatus('nj-status','Please fill in all required fields.','error'); return;
+  }
+  if (!document.getElementById('nj-phone').value.trim() && !document.getElementById('nj-email').value.trim()) {
+    showStatus('nj-status','Please enter at least a phone number or email.','error'); return;
   }
   post({
     form_type: 'new_job',
@@ -965,9 +968,12 @@ function submitPayment() {
 }
 
 function submitLead() {
-  const req = ['el-first','el-last','el-phone'];
+  const req = ['el-first','el-last'];
   if (req.some(id => !document.getElementById(id).value.trim())) {
     showStatus('el-status','Please fill in all required fields.','error'); return;
+  }
+  if (!document.getElementById('el-phone').value.trim() && !document.getElementById('el-email').value.trim()) {
+    showStatus('el-status','Please enter at least a phone number or email.','error'); return;
   }
   post({
     form_type: 'enter_lead',
@@ -987,9 +993,12 @@ function submitLead() {
 }
 
 function submitConvertLead() {
-  const req = ['cl-first','cl-clast','cl-address','cl-city','cl-phone','cl-date','cl-time','cl-wquote','cl-last'];
+  const req = ['cl-first','cl-clast','cl-address','cl-city','cl-date','cl-time','cl-wquote','cl-last'];
   if (req.some(id => !document.getElementById(id).value.trim())) {
     showStatus('cl-status','Please fill in all required fields.','error'); return;
+  }
+  if (!document.getElementById('cl-phone').value.trim() && !document.getElementById('cl-email').value.trim()) {
+    showStatus('cl-status','Please enter at least a phone number or email.','error'); return;
   }
   post({
     form_type: 'convert_lead',
