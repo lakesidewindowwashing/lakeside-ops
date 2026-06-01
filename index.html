@@ -411,14 +411,25 @@
         <div class="section-label">Job</div>
         <div class="form-grid">
           <div class="field span-2"><label>Job ID *</label><input type="text" id="ac-jobid" placeholder="e.g. 12"></div>
+          <div class="field span-2" id="ac-cleaner-1-wrap">
+            <label>Contractor 1 *</label>
+            <select id="ac-cleaner-1"><option value="">Select contractor</option></select>
+          </div>
+          <div class="field span-2" id="ac-cleaner-2-wrap" style="display:none;">
+            <label>Contractor 2</label>
+            <select id="ac-cleaner-2"><option value="">Select contractor</option></select>
+          </div>
+          <div class="field span-2" id="ac-cleaner-3-wrap" style="display:none;">
+            <label>Contractor 3</label>
+            <select id="ac-cleaner-3"><option value="">Select contractor</option></select>
+          </div>
           <div class="field span-2">
-            <label>Assign contractor *</label>
-            <select id="ac-cleaner"><option value="">Loading contractors...</option></select>
+            <button class="btn-secondary" id="ac-add-btn" onclick="addCleanerSlot()" type="button">+ Add Cleaner</button>
           </div>
         </div>
       </div>
       <div class="btn-row">
-        <button class="btn-secondary" onclick="document.getElementById('ac-jobid').value=''">Reset</button>
+        <button class="btn-secondary" onclick="resetAssignCleaner()">Reset</button>
         <button class="btn-primary" id="ac-btn" onclick="submitAssignCleaner()">Assign Contractor</button>
       </div>
       <div class="status-msg" id="ac-status"></div>
@@ -842,11 +853,34 @@ async function loadCleaners() {
 
 function populateCleanerDropdowns() {
   const opts = cleanersData.map(c => `<option value="${c.name}">${c.name} — ${c.phone}</option>`).join('');
-  document.getElementById('ac-cleaner').innerHTML = '<option value="">Select contractor</option>' + opts;
+  ['ac-cleaner-1','ac-cleaner-2','ac-cleaner-3'].forEach(id => {
+    document.getElementById(id).innerHTML = '<option value="">Select contractor</option>' + opts;
+  });
   const editSel = document.getElementById('mc-edit-select');
   editSel.innerHTML = '<option value="">Select contractor</option>' + opts;
 }
 
+let cleanerSlots = 1;
+function addCleanerSlot() {
+  if (cleanerSlots >= 3) return;
+  cleanerSlots++;
+  document.getElementById('ac-cleaner-' + cleanerSlots + '-wrap').style.display = 'block';
+  if (cleanerSlots === 3) {
+    document.getElementById('ac-add-btn').style.display = 'none';
+  }
+}
+
+function resetAssignCleaner() {
+  document.getElementById('ac-jobid').value = '';
+  ['ac-cleaner-1','ac-cleaner-2','ac-cleaner-3'].forEach(id => {
+    document.getElementById(id).selectedIndex = 0;
+  });
+  document.getElementById('ac-cleaner-2-wrap').style.display = 'none';
+  document.getElementById('ac-cleaner-3-wrap').style.display = 'none';
+  document.getElementById('ac-add-btn').style.display = 'block';
+  cleanerSlots = 1;
+}
+ 
 function populateEdit() {
   const val = document.getElementById('mc-edit-select').value;
   const c = cleanersData.find(x => x.name === val);
@@ -925,14 +959,17 @@ function submitNewJob() {
 }
 
 function submitAssignCleaner() {
-  if (!document.getElementById('ac-jobid').value || !document.getElementById('ac-cleaner').value) {
-    showStatus('ac-status','Please enter a Job ID and select a contractor.','error'); return;
+  if (!document.getElementById('ac-jobid').value || !document.getElementById('ac-cleaner-1').value) {
+    showStatus('ac-status','Please enter a Job ID and select at least one contractor.','error'); return;
   }
+  const cleaners = ['ac-cleaner-1','ac-cleaner-2','ac-cleaner-3']
+    .map(id => document.getElementById(id).value.trim())
+    .filter(v => v !== '');
   post({
     form_type: 'assign_cleaner',
     job_id: document.getElementById('ac-jobid').value.trim(),
-    cleaner: document.getElementById('ac-cleaner').value
-  }, 'ac-btn', 'ac-status', '✓ Contractor assigned! Jobs sheet and Calendar updated.');
+    cleaner: cleaners.join(', ')
+  }, 'ac-btn', 'ac-status', '✓ Contractor(s) assigned! Jobs sheet and Calendar updated.');
 }
 
 function submitJobStatus() {
