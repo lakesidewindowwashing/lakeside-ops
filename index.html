@@ -838,8 +838,7 @@ async function loadCleaners() {
 
     if (activeData.success) {
       cleanersData = activeData.contractors;
-      const opts = cleanersData.map(c => `<option value="${c.name}">${c.name} — ${c.phone}</option>`).join('');
-      document.getElementById('ac-cleaner').innerHTML = '<option value="">Select contractor</option>' + opts;
+      populateCleanerDropdowns();
     }
 
     if (allData.success) {
@@ -847,7 +846,7 @@ async function loadCleaners() {
       document.getElementById('mc-edit-select').innerHTML = '<option value="">Select contractor</option>' + allOpts;
     }
   } catch(e) {
-    document.getElementById('ac-cleaner').innerHTML = '<option value="">Could not load contractors</option>';
+    document.getElementById('ac-cleaner-1').innerHTML = '<option value="">Could not load contractors</option>';
   }
 }
 
