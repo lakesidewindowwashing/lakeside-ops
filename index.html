@@ -393,6 +393,13 @@
         </div>
       </div>
       <div class="card">
+        <div class="section-label">Promotion</div>
+        <div class="field">
+          <label>Promotion (optional)</label>
+          <select id="nj-promotion"><option value="">No promotion</option></select>
+        </div>
+      </div>
+      <div class="card">
         <div class="section-label">Notes</div>
         <div class="field"><textarea id="nj-notes" placeholder="Gate code, parking info, special instructions..."></textarea></div>
       </div>
@@ -615,6 +622,13 @@
         </div>
       </div>
       <div class="card">
+        <div class="section-label">Promotion</div>
+        <div class="field">
+          <label>Promotion (optional)</label>
+          <select id="cl-promotion"><option value="">No promotion</option></select>
+        </div>
+      </div>
+      <div class="card">
         <div class="section-label">Notes</div>
         <div class="field"><textarea id="cl-notes" placeholder="Any notes..."></textarea></div>
       </div>
@@ -829,12 +843,14 @@ async function post(payload, btnId, statusId, successMsg) {
 
 async function loadCleaners() {
   try {
-    const [activeRes, allRes] = await Promise.all([
+    const [activeRes, allRes, promoRes] = await Promise.all([
       fetch(SCRIPT_URL + '?action=get_contractors'),
-      fetch(SCRIPT_URL + '?action=get_all_contractors')
+      fetch(SCRIPT_URL + '?action=get_all_contractors'),
+      fetch(SCRIPT_URL + '?action=get_promotions')
     ]);
     const activeData = await activeRes.json();
     const allData = await allRes.json();
+    const promoData = await promoRes.json();
 
     if (activeData.success) {
       cleanersData = activeData.contractors;
@@ -845,6 +861,14 @@ async function loadCleaners() {
       const allOpts = allData.contractors.map(c => `<option value="${c.name}">${c.name} — ${c.phone} (${c.active === 'Y' ? 'Active' : 'Inactive'})</option>`).join('');
       document.getElementById('mc-edit-select').innerHTML = '<option value="">Select contractor</option>' + allOpts;
     }
+
+    if (promoData.success) {
+      const promoOpts = promoData.promotions.map(p => `<option value="${p.name}">${p.name} — ${p.description}</option>`).join('');
+      ['nj-promotion','cl-promotion'].forEach(id => {
+        document.getElementById(id).innerHTML = '<option value="">No promotion</option>' + promoOpts;
+      });
+    }
+
   } catch(e) {
     document.getElementById('ac-cleaner-1').innerHTML = '<option value="">Could not load contractors</option>';
   }
@@ -879,7 +903,7 @@ function resetAssignCleaner() {
   document.getElementById('ac-add-btn').style.display = 'block';
   cleanerSlots = 1;
 }
- 
+
 function populateEdit() {
   const val = document.getElementById('mc-edit-select').value;
   const c = cleanersData.find(x => x.name === val);
@@ -953,6 +977,7 @@ function submitNewJob() {
     window_quote: document.getElementById('nj-wquote').value || '0',
     screen_quote: document.getElementById('nj-squote').value || '0',
     total_quote: document.getElementById('nj-total').value || '0',
+    promotion: document.getElementById('nj-promotion').value,
     notes: document.getElementById('nj-notes').value.trim()
   }, 'nj-btn', 'nj-status', '✓ Job booked! Google Sheets and Calendar updated.');
 }
@@ -1053,6 +1078,7 @@ function submitConvertLead() {
     window_quote: document.getElementById('cl-wquote').value || '0',
     screen_quote: document.getElementById('cl-squote').value || '0',
     total_quote: document.getElementById('cl-total').value || '0',
+    promotion: document.getElementById('cl-promotion').value,
     notes: document.getElementById('cl-notes').value.trim()
   }, 'cl-btn', 'cl-status', '✓ Lead converted! Job booked and Calendar event created.');
 }
