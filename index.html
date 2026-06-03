@@ -1130,11 +1130,44 @@ function submitPayContractor() {
   if (req.some(id => !document.getElementById(id).value)) {
     showStatus('pc-status','Please fill in all required fields.','error'); return;
   }
-  post({
-    form_type: 'pay_contractor',
-    job_id: document.getElementById('pc-jobid').value.trim(),
-    payment_type: document.getElementById('pc-paytype').value
-  }, 'pc-btn', 'pc-status', '✓ Contractor payment logged! P&L updated.');
+
+  const jobId = document.getElementById('pc-jobid').value.trim();
+  const payType = document.getElementById('pc-paytype').value;
+  const btn = document.getElementById('pc-btn');
+  const orig = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify({
+      form_type: 'pay_contractor',
+      job_id: jobId,
+      payment_type: payType
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      showStatus('pc-status', '✓ Contractor payment logged! P&L updated.', 'success');
+      if (data.venmo && data.venmo.handles) {
+        const url = 'https://venmo.com/?txn=pay&audience=private&recipients=' +
+          encodeURIComponent(data.venmo.handles) +
+          '&amount=' + data.venmo.amount +
+          '&note=' + encodeURIComponent(data.venmo.note);
+        window.open(url, '_blank');
+      }
+    } else {
+      showStatus('pc-status', 'Error: ' + (data.message || 'Unknown error'), 'error');
+    }
+  })
+  .catch(() => {
+    showStatus('pc-status', 'Submission failed. Check your connection and try again.', 'error');
+  })
+  .finally(() => {
+    btn.disabled = false;
+    btn.textContent = orig;
+  });
 }
 </script>
 </body>
